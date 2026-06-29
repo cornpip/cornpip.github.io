@@ -1,0 +1,18 @@
+<!--
+  Custom <head> injection point provided by Chirpy (`metadata-hook.html`).
+  Theme-update safe: this overrides the gem's empty hook, NOT head.html itself.
+
+  hreflang for bilingual (KO/EN) post pairs.
+  Emitted ONLY when the post declares a translation pair via front matter:
+
+    lang: ko-KR              # this post's language
+    alt_lang: en             # the paired post's language
+    alt_url: /posts/xxx-en/  # the paired post's path
+
+  Posts without `alt_url` (the vast majority) output nothing here.
+  Remember: hreflang must be reciprocal — BOTH posts must point to each other.
+-->
+{% if page.alt_url and page.alt_lang %}
+  <link rel="alternate" hreflang="{{ page.lang | default: site.lang }}" href="{{ page.url | absolute_url }}">
+  <link rel="alternate" hreflang="{{ page.alt_lang }}" href="{{ page.alt_url | absolute_url }}">
+{% endif %}
