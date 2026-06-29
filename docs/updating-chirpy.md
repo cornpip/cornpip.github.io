@@ -113,3 +113,7 @@ bundle install                      # 이전 버전으로 복구
 ```
 
 이미 커밋했다면 해당 커밋을 `git revert` 한 뒤 push.
+
+---
+
+bundle exec jekyll serve --livereload
