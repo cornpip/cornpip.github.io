@@ -12,6 +12,8 @@
   Posts without `alt_url` (the vast majority) output nothing here.
   Remember: hreflang must be reciprocal — BOTH posts must point to each other.
 -->
+<style>#breadcrumb { visibility: hidden; }</style>
+
 {% if page.alt_url and page.alt_lang %}
   <link rel="alternate" hreflang="{{ page.lang | default: site.lang }}" href="{{ page.url | absolute_url }}">
   <link rel="alternate" hreflang="{{ page.alt_lang }}" href="{{ page.alt_url | absolute_url }}">
