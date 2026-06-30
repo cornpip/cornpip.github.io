@@ -65,12 +65,12 @@ bundle exec jekyll serve            # 깨진 부분 점검
 테마 본체(레이아웃·include·로직)는 gem 업데이트로 자동 반영됩니다.
 하지만 **레포에 직접 들어있는 파일**은 gem이 못 건드리므로, 큰 업데이트 때 수동 비교가 필요할 수 있습니다.
 
-| 대상 | 자동 업데이트 | 메이저 업데이트 시 할 일 |
-|---|---|---|
-| 테마 레이아웃/include/플러그인 (gem 내부) | ✅ | 없음 |
-| `_config.yml` (새 옵션 추가 시) | ❌ | starter와 비교해 새 키 반영 |
-| `.github/workflows/*.yml` | ❌ | starter와 비교해 갱신 |
-| `assets/lib` 서브모듈(정적 에셋) | ❌ | `git submodule update --remote` |
+| 대상                                      | 자동 업데이트 | 메이저 업데이트 시 할 일        |
+| ----------------------------------------- | ------------- | ------------------------------- |
+| 테마 레이아웃/include/플러그인 (gem 내부) | ✅             | 없음                            |
+| `_config.yml` (새 옵션 추가 시)           | ❌             | starter와 비교해 새 키 반영     |
+| `.github/workflows/*.yml`                 | ❌             | starter와 비교해 갱신           |
+| `assets/lib` 서브모듈(정적 에셋)          | ❌             | `git submodule update --remote` |
 
 비교 기준: https://github.com/cotes2020/chirpy-starter 의 같은 파일.
 
@@ -80,9 +80,9 @@ bundle exec jekyll serve            # 깨진 부분 점검
 
 아래는 gem을 복사한 게 아니라 **공식 hook/플러그인 방식**이라 `bundle update` 후에도 유지됩니다.
 
-| 파일 | 역할 | 안전한 이유 |
-|---|---|---|
-| `_includes/metadata-hook.html` | hreflang 주입 | Chirpy 공식 hook 오버라이드(빈 파일 대체) |
+| 파일                                | 역할                         | 안전한 이유                                |
+| ----------------------------------- | ---------------------------- | ------------------------------------------ |
+| `_includes/metadata-hook.html`      | hreflang 주입                | Chirpy 공식 hook 오버라이드(빈 파일 대체)  |
 | `_plugins/license-override-hook.rb` | 라이선스 CC BY-NC 4.0로 패치 | locale 키만 메모리에서 덮어씀(파일 복사 X) |
 
 > locale 전체를 복사하지 않은 이유: Jekyll은 데이터 파일을 deep-merge하지 않고 통째로 대체하므로,
@@ -113,7 +113,3 @@ bundle install                      # 이전 버전으로 복구
 ```
 
 이미 커밋했다면 해당 커밋을 `git revert` 한 뒤 push.
-
----
-
-bundle exec jekyll serve --livereload
