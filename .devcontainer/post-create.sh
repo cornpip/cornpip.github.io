@@ -6,6 +6,9 @@ if [ -f package.json ]; then
   npm run build
 fi
 
+# Install Claude Code (base image already ships node+npm via nvm, on PATH)
+npm install -g @anthropic-ai/claude-code
+
 # Install dependencies for shfmt extension
 curl -sS https://webi.sh/shfmt | sh &>/dev/null
 
