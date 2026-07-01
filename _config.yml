@@ -158,7 +158,15 @@ pwa:
     deny_paths:
       # - "/example"  # URLs match `<SITE_URL>/example/*` will not be cached by the PWA
 
-paginate: 10
+# Home pagination via jekyll-paginate-v2 (classic `paginate` breaks under
+# Polyglot — it renders the pager but never generates /page/N/). The home opts
+# in with `pagination: {enabled: true}` in its own front matter (index.html).
+pagination:
+  enabled: true
+  per_page: 10
+  permalink: "/page/:num/"
+  sort_reverse: true
+  sort_field: "date"
 
 # The base URL of your site
 baseurl: ""
@@ -235,3 +243,24 @@ jekyll-archives:
   permalinks:
     tag: /tags/:name/
     category: /categories/:name/
+
+# ---------------------------------------------------------------------------
+# Multilingual (jekyll-polyglot). See docs/bilingual-posting.md for the guide.
+#
+# Builds the whole site once per language: ko-KR at root (`/`), en under `/en/`.
+# `lang_vars: [lang]` makes Chirpy's `site.lang` follow the active language so
+# the theme UI localizes from the gem's own `_data/locales/*.yml` (no shadow).
+#
+# CAUTION: do NOT add `assets/js/data` to `exclude_from_localization`, or the
+# per-language `search.json` won't be generated and search breaks. See the
+# note in _plugins/polyglot-search-path-hook.rb.
+# ---------------------------------------------------------------------------
+plugins:
+  - jekyll-polyglot
+  - jekyll-paginate-v2
+
+languages: ["ko-KR", "en"]
+default_lang: "ko-KR"
+lang_vars: ["lang"]
+parallel_localization: false
+exclude_from_localization: ["assets/js/dist", "assets/css", "assets/img", "assets/lib", "assets/fonts"]

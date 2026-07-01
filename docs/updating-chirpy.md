@@ -80,13 +80,26 @@ bundle exec jekyll serve            # 깨진 부분 점검
 
 아래는 gem을 복사한 게 아니라 **공식 hook/플러그인 방식**이라 `bundle update` 후에도 유지됩니다.
 
-| 파일                                | 역할                         | 안전한 이유                                |
-| ----------------------------------- | ---------------------------- | ------------------------------------------ |
-| `_includes/metadata-hook.html`      | hreflang 주입                | Chirpy 공식 hook 오버라이드(빈 파일 대체)  |
-| `_plugins/license-override-hook.rb` | 라이선스 CC BY-NC 4.0로 패치 | locale 키만 메모리에서 덮어씀(파일 복사 X) |
+| 파일                                    | 역할                                    | 안전한 이유                                    |
+| --------------------------------------- | --------------------------------------- | ---------------------------------------------- |
+| `_includes/metadata-hook.html`          | hreflang + **언어 스위처 JS 주입**      | Chirpy 공식 hook 오버라이드(빈 파일 대체)      |
+| `_plugins/license-override-hook.rb`     | 라이선스 CC BY-NC 4.0로 패치            | locale 키만 메모리에서 덮어씀(파일 복사 X)     |
+| `_plugins/polyglot-search-path-hook.rb` | Polyglot 언어별 검색 인덱스 경로 교정   | 렌더 결과 문자열만 메모리에서 치환(파일 복사 X) |
+| `_config.yml` (polyglot/paginate-v2)    | 다국어 + 페이지네이션 설정              | 내 설정 파일                                    |
 
 > locale 전체를 복사하지 않은 이유: Jekyll은 데이터 파일을 deep-merge하지 않고 통째로 대체하므로,
 > 복사하면 이후 테마가 추가하는 번역 키를 못 받아 깨집니다. 그래서 플러그인으로 필요한 키만 패치.
+
+### 4-1. 다국어(Polyglot) 관련 업데이트 주의점
+
+Polyglot도 **gem 파일을 하나도 복사(shadow)하지 않아** `bundle update`에 안전합니다.
+다만 아래 두 가지는 Chirpy 내부 구조에 의존하므로, 메이저 업데이트 후 확인하세요. (가이드: [bilingual-posting.md](bilingual-posting.md))
+
+- **검색 경로 커플링**: `polyglot-search-path-hook.rb`가 `/assets/js/data/search.json` 문자열에 의존.
+  Chirpy가 검색 인덱스 경로를 바꾸면 플러그인이 **조용히 no-op**(검색이 루트 인덱스로 폴백, 빌드는 안 깨짐). 이때 플러그인의 경로 상수만 갱신.
+- **페이지네이션**: classic `paginate:`는 Polyglot에서 `/page/N/`을 안 만들어 `jekyll-paginate-v2`로 대체함.
+  Chirpy가 홈(`home.html`)의 `paginator` 사용법을 크게 바꾸면 페이저 확인 필요(현재는 v2가 호환).
+- **금지**: `exclude_from_localization`에 `assets/js/data`를 넣으면 언어별 `search.json`이 사라져 검색이 깨짐.
 
 ---
 
