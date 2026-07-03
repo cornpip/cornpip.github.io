@@ -12,7 +12,162 @@
   Posts without `alt_url` (the vast majority) output nothing here.
   Remember: hreflang must be reciprocal — BOTH posts must point to each other.
 -->
+<style>#breadcrumb { visibility: hidden; }</style>
+
 {% if page.alt_url and page.alt_lang %}
   <link rel="alternate" hreflang="{{ page.lang | default: site.lang }}" href="{{ page.url | absolute_url }}">
   <link rel="alternate" hreflang="{{ page.alt_lang }}" href="{{ page.alt_url | absolute_url }}">
+{% endif %}
+
+<!--
+  Language switcher (jekyll-polyglot). Injected into the topbar via JS so NO gem
+  file (topbar.html) is shadowed. Polyglot mirrors the whole site per language,
+  so swapping the `/<lang>/` URL prefix always lands on a real page.
+  Only renders when Polyglot exposes >= 2 languages.
+-->
+{% if site.languages and site.languages.size > 1 %}
+  <style>
+    #lang-switcher {
+      height: 1.9rem;
+      margin-left: auto;   /* absorb free space → pin next to search, stable per page */
+      margin-right: 0.5rem;
+      padding: 0 1.4rem 0 0.5rem;
+      font-family: inherit;   /* match the blog body font (form controls don't inherit) */
+      font-size: 0.85rem;
+      color: var(--sidebar-muted, inherit);
+      background-color: transparent;
+      border: 1px solid var(--search-border-color, rgba(127, 127, 127, 0.3));
+      border-radius: 1rem;
+      cursor: pointer;
+    }
+    #lang-switcher:focus { outline: none; }
+    #lang-toast {
+      position: fixed;
+      top: 3.2rem;
+      right: 1rem;
+      z-index: 1090;
+      max-width: 15rem;
+      padding: 0.45rem 0.7rem;
+      font-size: 0.78rem;
+      line-height: 1.3;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.85);
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    #lang-toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+  <script>
+    window.__i18n = {
+      langs: {{ site.languages | jsonify }},
+      default: {{ site.default_lang | jsonify }},
+      active: {{ site.active_lang | jsonify }},
+      labels: { "ko-KR": "한국어", "en": "English" },
+      messages: { "en": "Untranslated posts show the original." }
+    };
+    (function () {
+      function showToast(msg) {
+        var old = document.getElementById("lang-toast");
+        if (old) old.remove();
+        var t = document.createElement("div");
+        t.id = "lang-toast";
+        t.setAttribute("role", "status");
+        t.textContent = msg;
+        document.body.appendChild(t);
+        // Anchor the toast directly under the language switcher.
+        var anchor = document.getElementById("lang-switcher");
+        if (anchor) {
+          var r = anchor.getBoundingClientRect();
+          t.style.top = r.bottom + 8 + "px";
+          t.style.right = Math.max(8, window.innerWidth - r.right) + "px";
+        }
+        requestAnimationFrame(function () { t.classList.add("show"); });
+
+        var timer;
+        function hide() {
+          if (!t.parentNode) return;
+          clearTimeout(timer);
+          t.classList.remove("show");
+          setTimeout(function () { if (t.parentNode) t.remove(); }, 500);
+        }
+        timer = setTimeout(hide, 4000);              // auto-dismiss after 4s
+        t.addEventListener("click", hide);           // tap/click to dismiss now
+        t.addEventListener("touchstart", hide, { passive: true });
+      }
+
+      function init() {
+        var cfg = window.__i18n;
+        if (!cfg || !cfg.langs || cfg.langs.length < 2) return;
+        if (document.getElementById("lang-switcher")) return;
+
+        var path = location.pathname;
+        var cur = cfg.default;
+        for (var i = 0; i < cfg.langs.length; i++) {
+          var l = cfg.langs[i];
+          if (l !== cfg.default && (path === "/" + l || path.indexOf("/" + l + "/") === 0)) {
+            cur = l;
+            break;
+          }
+        }
+        var base = path;
+        if (cur !== cfg.default) {
+          base = path.replace(new RegExp("^/" + cur), "");
+          if (base === "") base = "/";
+        }
+
+        var sel = document.createElement("select");
+        sel.id = "lang-switcher";
+        sel.setAttribute("aria-label", "Language");
+        cfg.langs.forEach(function (l) {
+          var o = document.createElement("option");
+          o.value = l;
+          o.textContent = (cfg.labels && cfg.labels[l]) || l;
+          if (l === cur) o.selected = true;
+          sel.appendChild(o);
+        });
+        sel.addEventListener("change", function () {
+          var t = sel.value;
+          // Remember the switch so the landing page can show a toast if it is
+          // an untranslated (fallback) post in the chosen language.
+          try { sessionStorage.setItem("__langSwitch", t); } catch (e) {}
+          var dest = (t === cfg.default ? "" : "/" + t) + base;
+          if (dest === "") dest = "/";
+          location.pathname = dest;
+        });
+
+        // Place the switcher right before the search box so `margin-left:auto`
+        // pins it to the search cluster on the right, stable across pages.
+        var anchor =
+          document.getElementById("search") ||
+          document.getElementById("search-trigger");
+        if (anchor && anchor.parentNode) {
+          anchor.parentNode.insertBefore(sel, anchor);
+        } else {
+          var tb = document.getElementById("topbar");
+          if (tb) tb.appendChild(sel);
+        }
+
+        // Toast: shown right after switching to a non-default language,
+        // anywhere (home, post, list). Announces the fallback policy.
+        var switched = null;
+        try {
+          switched = sessionStorage.getItem("__langSwitch");
+          sessionStorage.removeItem("__langSwitch");
+        } catch (e) {}
+        if (switched && switched === cfg.active && cfg.active !== cfg.default) {
+          showToast((cfg.messages && cfg.messages[cfg.active]) || "Showing the original.");
+        }
+      }
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    })();
+  </script>
 {% endif %}

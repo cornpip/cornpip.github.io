@@ -1,0 +1,40 @@
+<!--
+  Override of the theme's `trending-tags.html` (gem: jekyll-theme-chirpy).
+  Theme-update safe: same filename in the site's `_includes/` shadows the gem's
+  copy, so NO gem file is modified and the layout still calls it unchanged.
+
+  Behaviour change: instead of "Trending Tags" (ranked by post count), this
+  lists RECENT tags — tags taken from the newest posts first, de-duplicated.
+-->
+
+{% assign MAX = 10 %}
+
+{% assign recent_tags = '' | split: '' %}
+
+<!-- site.posts is ordered newest-first, so first-seen == most recent. -->
+{% for post in site.posts %}
+  {% for tag_name in post.tags %}
+    {% unless recent_tags contains tag_name %}
+      {% assign recent_tags = recent_tags | push: tag_name %}
+    {% endunless %}
+  {% endfor %}
+  {% if recent_tags.size >= MAX %}{% break %}{% endif %}
+{% endfor %}
+
+{% if recent_tags.size > MAX %}
+  {% assign recent_tags = recent_tags | slice: 0, MAX %}
+{% endif %}
+
+{% if recent_tags.size > 0 %}
+  <section>
+    <h2 class="panel-heading">
+      {%- if include.lang == 'en' -%}Recent Tags{%- else -%}최신 태그{%- endif -%}
+    </h2>
+    <div class="d-flex flex-wrap mt-3 mb-1 me-3">
+      {% for tag_name in recent_tags %}
+        {% assign url = tag_name | slugify | url_encode | prepend: '/tags/' | append: '/' %}
+        <a class="post-tag btn btn-outline-primary" href="{{ url | relative_url }}">{{ tag_name }}</a>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
