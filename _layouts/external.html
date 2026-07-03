@@ -1,0 +1,17 @@
+---
+# Minimal redirect layout: sends the visitor straight to `page.external_url`.
+# Used by sidebar tabs that should open an external site instead of a local page.
+---
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url={{ page.external_url }}">
+    <link rel="canonical" href="{{ page.external_url }}">
+    <title>Redirecting…</title>
+    <script>location.replace("{{ page.external_url }}");</script>
+  </head>
+  <body>
+    Redirecting to <a href="{{ page.external_url }}">{{ page.external_url }}</a>…
+  </body>
+</html>
