@@ -168,6 +168,13 @@ pagination:
   sort_reverse: true
   sort_field: "date"
 
+# The Chirpy theme's post-paginator builds numbered page links from the classic
+# `site.paginate_path` (default `/page:num`), which does not match the paginate-v2
+# `permalink` above and produces broken links like `/page16`. Align it with the v2
+# permalink so links resolve to the actually-generated `/page/:num/` pages.
+# (Only classic `paginate:` activates old pagination; this key alone stays inert.)
+paginate_path: "/page/:num/"
+
 # The base URL of your site
 baseurl: ""
 
