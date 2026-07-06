@@ -15,6 +15,28 @@
 <style>
   #breadcrumb { visibility: hidden; }
   #search-input { font-size: 0.95rem; }   /* override Bootstrap .form-control's 1rem; placeholder inherits this */
+
+  /*
+    Prevent document-level horizontal overflow on mobile (Chirpy has no
+    handling for either case; overflow wider than the viewport breaks
+    orientation changes: leftover h-scroll / page not filling the width).
+  */
+  /* Long display equations scroll inside their own box */
+  mjx-container[jax="CHTML"][display="true"] {
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+  }
+
+  /* Code-header file-path labels (span::after = attr(data-label-text))
+     truncate instead of pushing past the viewport; flex item needs min-width: 0 */
+  .code-header span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 </style>
 
 {% if page.alt_url and page.alt_lang %}
