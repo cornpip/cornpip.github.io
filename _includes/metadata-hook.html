@@ -17,11 +17,12 @@
   #search-input { font-size: 0.95rem; }   /* override Bootstrap .form-control's 1rem; placeholder inherits this */
 
   /*
-    Prevent document-level horizontal overflow on mobile (Chirpy has no
-    handling for either case; overflow wider than the viewport breaks
-    orientation changes: leftover h-scroll / page not filling the width).
+    Mobile: prevent document-level horizontal overflow. Chirpy handles neither
+    of the two cases below; content wider than the viewport breaks orientation
+    changes (leftover h-scroll / page not filling the width).
   */
-  /* Long display equations scroll inside their own box */
+
+  /* 1. Long display equations scroll inside their own box */
   mjx-container[jax="CHTML"][display="true"] {
     display: block;
     overflow-x: auto;
@@ -29,13 +30,25 @@
     max-width: 100%;
   }
 
-  /* Code-header file-path labels (span::after = attr(data-label-text))
-     truncate instead of pushing past the viewport; flex item needs min-width: 0 */
+  /* 2. Code-header file-path labels (span::after = attr(data-label-text))
+        truncate instead of pushing past the viewport; flex item needs min-width: 0 */
   .code-header span {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  /*
+    Footnote back-links (the ↩ at the bottom of a post) jump to the reference
+    in the body, which lands flush against the top of the viewport with no
+    preceding context. Reserve 40% of the viewport above it so the reference
+    settles near the middle of the screen instead.
+    Theme JS does not touch footnote anchors, so this is a plain native
+    anchor jump and scroll-margin applies.
+  */
+  sup[id^="fnref:"] {
+    scroll-margin-top: 40vh;
   }
 </style>
 
