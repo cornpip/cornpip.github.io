@@ -1,0 +1,65 @@
+---
+# Korean-language sitemap, referenced by the /sitemap.xml index. Lists only
+# URLs that exist in the ko-KR build. hreflang alternates are emitted for the
+# home page, collection docs (posts share an explicit permalink with their en
+# translation; tabs are rendered in every language), and ordinary pages — but
+# NOT for jekyll-archives tag/category pages: their names are translated per
+# language (e.g. 팀 vs team), so an /en/-prefixed guess would point at a page
+# that does not exist.
+layout: null
+permalink: /sitemap-ko.xml
+lang-exclusive: ["ko-KR"]
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{%- comment %} The home page is claimed by jekyll-paginate-v2, so it never
+appears in site.html_pages — list it explicitly. {% endcomment %}
+{%- assign home_ko = '/' | absolute_url | xml_escape %}
+{%- assign home_en = '/en/' | absolute_url | xml_escape %}
+  <url>
+    <loc>{{ home_ko }}</loc>
+    <lastmod>{{ site.time | date_to_xmlschema }}</lastmod>
+    <xhtml:link rel="alternate" hreflang="ko-KR" href="{{ home_ko }}" />
+    <xhtml:link rel="alternate" hreflang="en" href="{{ home_en }}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="{{ home_ko }}" />
+  </url>
+{%- assign collections = site.collections | where_exp: 'collection', 'collection.output != false' %}
+{%- for collection in collections %}
+{%- assign docs = collection.docs | where_exp: 'doc', 'doc.sitemap != false' %}
+{%- for doc in docs %}
+{%- assign clean_url = doc.url | replace: '/index.html', '/' %}
+{%- assign loc_ko = clean_url | absolute_url | xml_escape %}
+{%- assign loc_en = clean_url | prepend: '/en' | absolute_url | xml_escape %}
+{%- capture lastmod %}{% if doc.last_modified_at or doc.date %}<lastmod>{{ doc.last_modified_at | default: doc.date | date_to_xmlschema }}</lastmod>{% endif %}{% endcapture %}
+  <url>
+    <loc>{{ loc_ko }}</loc>
+    {{ lastmod }}
+    <xhtml:link rel="alternate" hreflang="ko-KR" href="{{ loc_ko }}" />
+    <xhtml:link rel="alternate" hreflang="en" href="{{ loc_en }}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="{{ loc_ko }}" />
+  </url>
+{%- endfor %}
+{%- endfor %}
+{%- assign pages = site.html_pages | where_exp: 'doc', 'doc.sitemap != false' | where_exp: 'doc', 'doc.url != "/404.html"' %}
+{%- for page in pages %}
+{%- assign clean_url = page.url | replace: '/index.html', '/' %}
+{%- assign loc_ko = clean_url | absolute_url | xml_escape %}
+{%- capture lastmod %}{% if page.last_modified_at %}<lastmod>{{ page.last_modified_at | date_to_xmlschema }}</lastmod>{% endif %}{% endcapture %}
+{%- assign first_seg = clean_url | split: '/' | slice: 1 | first %}
+{%- if first_seg == 'tags' or first_seg == 'categories' %}
+  <url>
+    <loc>{{ loc_ko }}</loc>
+    {{ lastmod }}
+  </url>
+{%- else %}
+{%- assign loc_en = clean_url | prepend: '/en' | absolute_url | xml_escape %}
+  <url>
+    <loc>{{ loc_ko }}</loc>
+    {{ lastmod }}
+    <xhtml:link rel="alternate" hreflang="ko-KR" href="{{ loc_ko }}" />
+    <xhtml:link rel="alternate" hreflang="en" href="{{ loc_en }}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="{{ loc_ko }}" />
+  </url>
+{%- endif %}
+{%- endfor %}
+</urlset>
