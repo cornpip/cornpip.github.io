@@ -1,0 +1,65 @@
+---
+# English-language sitemap, referenced by the /sitemap.xml index. Built only
+# during the /en/ build (permalink /sitemap.xml lands at /en/sitemap.xml), so
+# it lists exactly the pages that build generated — including tag/category
+# archives derived from the en posts' translated tag names, which the ko build
+# cannot enumerate. Inside the en build doc.url has no /en prefix; en URLs are
+# constructed here explicitly. Polyglot's post-render href rewriting leaves
+# them alone (already /en-prefixed) and skips hrefs preceded by
+# hreflang="ko-KR" / hreflang="x-default", so the alternate links below must
+# keep that exact attribute order.
+layout: null
+permalink: /sitemap.xml
+lang-exclusive: ["en"]
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{%- assign home_ko = '/' | absolute_url | xml_escape %}
+{%- assign home_en = '/en/' | absolute_url | xml_escape %}
+  <url>
+    <loc>{{ home_en }}</loc>
+    <lastmod>{{ site.time | date_to_xmlschema }}</lastmod>
+    <xhtml:link rel="alternate" hreflang="ko-KR" href="{{ home_ko }}" />
+    <xhtml:link rel="alternate" hreflang="en" href="{{ home_en }}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="{{ home_ko }}" />
+  </url>
+{%- assign collections = site.collections | where_exp: 'collection', 'collection.output != false' %}
+{%- for collection in collections %}
+{%- assign docs = collection.docs | where_exp: 'doc', 'doc.sitemap != false' %}
+{%- for doc in docs %}
+{%- assign clean_url = doc.url | replace: '/index.html', '/' %}
+{%- assign loc_ko = clean_url | absolute_url | xml_escape %}
+{%- assign loc_en = clean_url | prepend: '/en' | absolute_url | xml_escape %}
+{%- capture lastmod %}{% if doc.last_modified_at or doc.date %}<lastmod>{{ doc.last_modified_at | default: doc.date | date_to_xmlschema }}</lastmod>{% endif %}{% endcapture %}
+  <url>
+    <loc>{{ loc_en }}</loc>
+    {{ lastmod }}
+    <xhtml:link rel="alternate" hreflang="ko-KR" href="{{ loc_ko }}" />
+    <xhtml:link rel="alternate" hreflang="en" href="{{ loc_en }}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="{{ loc_ko }}" />
+  </url>
+{%- endfor %}
+{%- endfor %}
+{%- assign pages = site.html_pages | where_exp: 'doc', 'doc.sitemap != false' | where_exp: 'doc', 'doc.url != "/404.html"' %}
+{%- for page in pages %}
+{%- assign clean_url = page.url | replace: '/index.html', '/' %}
+{%- assign loc_en = clean_url | prepend: '/en' | absolute_url | xml_escape %}
+{%- capture lastmod %}{% if page.last_modified_at %}<lastmod>{{ page.last_modified_at | date_to_xmlschema }}</lastmod>{% endif %}{% endcapture %}
+{%- assign first_seg = clean_url | split: '/' | slice: 1 | first %}
+{%- if first_seg == 'tags' or first_seg == 'categories' %}
+  <url>
+    <loc>{{ loc_en }}</loc>
+    {{ lastmod }}
+  </url>
+{%- else %}
+{%- assign loc_ko = clean_url | absolute_url | xml_escape %}
+  <url>
+    <loc>{{ loc_en }}</loc>
+    {{ lastmod }}
+    <xhtml:link rel="alternate" hreflang="ko-KR" href="{{ loc_ko }}" />
+    <xhtml:link rel="alternate" hreflang="en" href="{{ loc_en }}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="{{ loc_ko }}" />
+  </url>
+{%- endif %}
+{%- endfor %}
+</urlset>
