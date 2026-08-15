@@ -1,7 +1,7 @@
 ---
 title: "mediapipe_face_mesh 패키지 소개"
 date: 2026-08-15 12:00:00 +0900
-categories: [Project, mediapipe_face_mesh]
+categories: [Software, mediapipe_face_mesh]
 tags: ["mediapipe_face_mesh", "Flutter package", "face mesh", "Face Detection", "iris", "blendshapes", "head pose", "litert", "Pub.dev"]
 math: false
 render_with_liquid: false
