@@ -1,0 +1,20 @@
+services:
+  jekyll:
+    image: mcr.microsoft.com/devcontainers/jekyll:2-bullseye
+    container_name: blog-jekyll
+    working_dir: /srv/jekyll
+    command: bash -lc "git config --global --add safe.directory /srv/jekyll && bundle install && bundle exec jekyll serve --host 0.0.0.0 --livereload --force_polling"
+    ports:
+      - "4000:4000"
+      - "35729:35729"
+    volumes:
+      - .:/srv/jekyll
+      # gem cache: survives container recreation, so bundle install is fast after the first run
+      - gems:/usr/local/rvm/gems
+    # memory grows with each livereload rebuild; over 1g the kernel kills
+    # the process and restart policy brings it back fresh
+    mem_limit: 1g
+    restart: unless-stopped
+
+volumes:
+  gems:
