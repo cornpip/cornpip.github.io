@@ -52,6 +52,12 @@
   }
 </style>
 
+{%- comment %} Tag archives (jekyll-archives) are thin pages with a few posts
+each. Keep them out of the index but let crawlers follow their links. {% endcomment %}
+{% if page.type == 'tag' %}
+  <meta name="robots" content="noindex, follow">
+{% endif %}
+
 {% if page.alt_url and page.alt_lang %}
   <link rel="alternate" hreflang="{{ page.lang | default: site.lang }}" href="{{ page.url | absolute_url }}">
   <link rel="alternate" hreflang="{{ page.alt_lang }}" href="{{ page.alt_url | absolute_url }}">
