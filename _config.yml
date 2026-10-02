@@ -237,6 +237,7 @@ exclude:
   - docs
   - tools
   - README.md
+  - CLAUDE.md
   - LICENSE
   - LICENSE-CONTENT
   - purgecss.js

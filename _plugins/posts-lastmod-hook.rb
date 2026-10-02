@@ -1,13 +1,16 @@
 #!/usr/bin/env ruby
 #
 # Check for changed posts
+#
+# Commits whose message contains "[skip lastmod]" are skipped, so bulk edits
+# that do not change post content keep last_modified_at. See docs/commit.md.
 
 Jekyll::Hooks.register :posts, :post_init do |post|
 
-  commit_num = `git rev-list --count HEAD "#{ post.path }"`
+  commit_dates = `git log -F --invert-grep --grep="[skip lastmod]" --pretty="%ad" --date=iso -- "#{ post.path }"`.lines
 
-  if commit_num.to_i > 1
-    lastmod_date = `git log -1 --pretty="%ad" --date=iso "#{ post.path }"`
+  if commit_dates.size > 1
+    lastmod_date = commit_dates.first.strip
     post.data['last_modified_at'] = lastmod_date
   end
 
