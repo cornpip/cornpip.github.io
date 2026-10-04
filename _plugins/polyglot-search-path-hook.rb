@@ -31,6 +31,13 @@ Jekyll::Hooks.register [:pages, :documents], :post_render do |item|
   next if active.nil? || default.nil? || active == default
   next if item.output.nil?
 
+  # The index itself: Polyglot only relativizes href="..." in HTML, so the
+  # post URLs inside the per-language search.json stay unprefixed.
+  if item.url == SEARCH_INDEX_PATH
+    item.output = item.output.gsub(%r{("url":\s*")/(?!#{Regexp.escape(active)}/)}, "\\1/#{active}/")
+    next
+  end
+
   localized = "/#{active}#{SEARCH_INDEX_PATH}"
   # Guard against double-prefixing if the string is already localized.
   next if item.output.include?(localized)
