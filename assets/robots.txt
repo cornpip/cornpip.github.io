@@ -1,0 +1,17 @@
+---
+permalink: /robots.txt
+# Overrides the Chirpy theme's assets/robots.txt. Tag archives and home
+# pagination are thin listing pages; blocking them keeps the crawl budget on
+# posts. Built only into the default-language site, like sitemap.xml.
+lang-exclusive: ["ko-KR"]
+---
+
+User-agent: *
+
+Disallow: /norobots/
+Disallow: /tags/
+Disallow: /en/tags/
+Disallow: /page/
+Disallow: /en/page/
+
+Sitemap: {{ '/sitemap.xml' | absolute_url }}
